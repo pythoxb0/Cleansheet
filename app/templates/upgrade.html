@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Upgrade to Pro Plan</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>Demo Payment System:</strong> This is a simulated payment process. No real payments will be processed.
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5>Pro Plan</h5>
+                                <h3 class="text-primary">$5/month</h3>
+                                <ul class="list-unstyled text-start">
+                                    <li>✓ Unlimited rows per file</li>
+                                    <li>✓ Unlimited files</li>
+                                    <li>✓ All cleaning features</li>
+                                    <li>✓ 30-day file retention</li>
+                                    <li>✓ Priority support</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <form method="POST" action="{{ url_for('payment.process_payment') }}">
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="credit_card" value="credit_card" checked>
+                                    <label class="form-check-label" for="credit_card">
+                                        💳 Credit Card
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="paypal">
+                                    <label class="form-check-label" for="paypal">
+                                        📧 PayPal
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Credit Card Details -->
+                            <div id="credit-card-details">
+                                <div class="mb-3">
+                                    <label for="card_number" class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" id="card_number" name="card_number" 
+                                           placeholder="4242 4242 4242 4242" value="4242 4242 4242 4242">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="expiry_date" class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" id="expiry_date" name="expiry_date" 
+                                               placeholder="MM/YY" value="12/25">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" name="cvv" 
+                                               placeholder="123" value="123">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    💳 Upgrade Now - $5/month
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <small class="text-muted">
+                        By upgrading, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+                        This is a demo - no real payment will be processed.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const creditCardRadio = document.getElementById('credit_card');
+    const paypalRadio = document.getElementById('paypal');
+    const creditCardDetails = document.getElementById('credit-card-details');
+    
+    function updatePaymentFields() {
+        if (creditCardRadio.checked) {
+            creditCardDetails.style.display = 'block';
+        } else {
+            creditCardDetails.style.display = 'none';
+        }
+    }
+    
+    creditCardRadio.addEventListener('change', updatePaymentFields);
+    paypalRadio.addEventListener('change', updatePaymentFields);
+    
+    // Initial update
+    updatePaymentFields();
+});
+</script>
+{% endblock %}

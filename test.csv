@@ -1,0 +1,21 @@
+ID,Name,Email,Age,City,Salary,Department,Join Date
+1,John Doe,john.doe@example.com,28,New York,50000,Marketing,2022-01-15
+2,Jane Smith,jane.smith@example.com,32,Los Angeles,60000,Sales,2021-08-23
+3,Bob Johnson,bob.johnson@example.com,45,Chicago,75000,IT,2020-03-10
+4,Alice Brown,alice.brown@example.com,29,Houston,55000,HR,2022-05-18
+5,John Doe,john.doe@example.com,28,New York,50000,Marketing,2022-01-15
+6, Mike Wilson, mike.wilson@example.com ,35, Phoenix,,Finance,2023-02-14
+7,Sarah Davis,sarah.d@example.com,41,Philadelphia,80000,Operations,2019-11-05
+8,Tom Anderson,tom.anderson@example.com,26,San Antonio,48000,Marketing,2023-01-30
+9, Lisa Garcia, lisa.garcia@example.com ,,San Diego,62000,Sales,2021-07-12
+10,James Lee,james.lee@example.com,38,Dallas,70000,IT,2020-09-22
+11,,jennifer.wang@example.com,31,San Jose,58000,HR,2022-03-08
+12,Kevin Martinez,kevin.martinez@example.com,29, Austin,52000,Marketing,2022-11-17
+13,Amanda Taylor,amanda.taylor@example.com,36,Jacksonville,67000,Finance,2021-04-19
+14,David Brown,david.brown@example.com,43,San Francisco,,IT,2019-06-25
+15, Jessica Lopez, jessica.lopez@example.com ,27,Columbus,49000,Sales,2023-03-03
+16,John Doe,john.doe@example.com,28,New York,50000,Marketing,2022-01-15
+17,Matthew Harris,matthew.harris@example.com,34,Indianapolis,63000,Operations,2021-02-28
+18,,sophia.clark@example.com,30,Seattle,56000,HR,2022-07-14
+19,Daniel Lewis,daniel.lewis@example.com,39,Denver,72000,IT,2020-12-01
+20, Olivia Walker, olivia.walker@example.com ,26,Washington DC,51000,Marketing,2022-10-09

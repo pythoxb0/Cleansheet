@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <div class="card">
+            <div class="card-body py-5">
+                <div class="text-success mb-4" style="font-size: 4rem;">
+                    ✅
+                </div>
+                
+                <h2 class="card-title">Payment Successful!</h2>
+                <p class="card-text">Your account has been upgraded to <strong>Pro Plan</strong></p>
+                
+                <div class="alert alert-success">
+                    <h5>Welcome to CleanSheet Pro! 🎉</h5>
+                    <p>You now have access to unlimited data cleaning and all premium features.</p>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-primary me-3">
+                        Start Cleaning
+                    </a>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary">
+                        Go to Dashboard
+                    </a>
+                </div>
+                
+                <div class="mt-4">
+                    <small class="text-muted">
+                        Receipt emailed to {{ current_user.email }}<br>
+                        Transaction ID: DEMO-{{ range(10000, 99999) | random }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

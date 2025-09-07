@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% if current_user.plan == 'free' %}
+<div class="alert alert-info">
+    <h6>✨ Upgrade to Pro!</h6>
+    <p>Unlock unlimited rows, unlimited files, and priority features</p>
+    <a href="{{ url_for('payment.upgrade') }}" class="btn btn-sm btn-primary">Upgrade Now - $5/month</a>
+</div>
+{% else %}
+<div class="alert alert-success">
+    <h6>✅ Pro Account Active</h6>
+    <p>You have access to all premium features</p>
+    <a href="{{ url_for('payment.downgrade') }}" class="btn btn-sm btn-outline-secondary">Downgrade to Free</a>
+</div>
+{% endif %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2>Welcome, {{ current_user.email }}!</h2>
+        <p class="lead">Your data cleaning dashboard</p>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Clean New File</h5>
+                        <p class="card-text">Upload and process a new CSV or Excel file</p>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-primary">Upload File</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Your Plan</h5>
+                        <p class="card-text">
+                            <span class="badge bg-{{ 'success' if current_user.plan == 'pro' else 'secondary' }}">
+                                {{ current_user.plan|upper }}
+                            </span>
+                        </p>
+                        <p class="small">Free tier: 500 rows per file</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Files</h5>
+            </div>
+            <div class="card-body">
+                {% if files %}
+                    <div class="list-group">
+                        {% for file in files %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ file.original_filename }}</h6>
+                                    <small>{{ file.created_at.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <p class="mb-1 small">
+                                    {{ file.rows_original }} → {{ file.rows_cleaned }} rows
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No files processed yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
