@@ -35,6 +35,27 @@ def dashboard():
     user_files = File.query.filter_by(user_id=current_user.id).order_by(File.created_at.desc()).limit(10).all()
     return render_template('dashboard.html', files=user_files)
 
+
+# Add to routes.py
+@main.errorhandler(413)
+def too_large(e):
+    return "File is too large", 413
+
+@main.errorhandler(500)
+def internal_error(e):
+    db.session.rollback()
+    return "Internal server error", 500
+
+
+@main.route('/help-center')
+def help_center():
+    return render_template('help_center.html')
+
+@main.route('/contact')
+def contact(   ):
+    return render_template('contact.html')                        
+                                    #: CONTACT ROUTE (FIXED)
+
 @main.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():

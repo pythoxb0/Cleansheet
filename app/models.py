@@ -2,6 +2,8 @@ from app import db
 from flask_login import UserMixin
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from flask import current_app
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,19 +21,30 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
     
     def can_process_file(self, row_count):
-        """Check if user can process file based on their plan"""
         if self.plan == 'pro':
             return True
-        return row_count <= 500  # Free tier limit
+        return row_count <= 500
+    
     def upgrade_to_pro(self):
-        """Upgrade user to pro plan"""
         self.plan = 'pro'
         db.session.commit()
     
     def downgrade_to_free(self):
-        """Downgrade user to free plan"""
         self.plan = 'free'
         db.session.commit()
+    
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id})
+    
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age=1800)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)

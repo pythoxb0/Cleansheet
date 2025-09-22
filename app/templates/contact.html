@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <h1 class="mb-4">Contact Us</h1>
+            
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+                    <h5>Email Support</h5>
+                    <p class="lead"><strong>support@cleansheet.com</strong></p>
+                    <p>We typically respond within 24 hours.</p>
+                    
+                    <a href="mailto:support@cleansheet.com" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>Send Email
+                    </a>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5>Before Contacting Us</h5>
+                    <ul>
+                        <li>Check our <a href="{{ url_for('main.help_center') }}">Help Center</a> for common solutions</li>
+                        <li>Make sure you're using supported file formats (CSV, Excel)</li>
+                        <li>Try refreshing the page if you encounter issues</li>
+                        <li>Clear your browser cache if problems persist</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
