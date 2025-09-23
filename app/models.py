@@ -9,7 +9,6 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
-    plan = db.Column(db.String(20), default='free')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     files = db.relationship('File', backref='user', lazy=True)
@@ -20,18 +19,9 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
+    # REMOVED: plan-related methods
     def can_process_file(self, row_count):
-        if self.plan == 'pro':
-            return True
-        return row_count <= 500
-    
-    def upgrade_to_pro(self):
-        self.plan = 'pro'
-        db.session.commit()
-    
-    def downgrade_to_free(self):
-        self.plan = 'free'
-        db.session.commit()
+        return True  # No restrictions for anyone
     
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'])

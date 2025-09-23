@@ -25,7 +25,7 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
-                    
+                    <!-- PUBLIC LINKS FOR ALL USERS -->
                     
                     {% if current_user.is_authenticated %}
                         <!-- AUTHENTICATED USER LINKS -->
@@ -93,18 +93,15 @@
                     <h5 class="mb-3">CleanSheet</h5>
                     <p>Clean and transform your data in seconds. Professional data cleaning tools for everyone.</p>
                     <div class="social-links">
-                        <a href="#" class="text-light me-3"><i class="fab fa-twitter fa-lg"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-linkedin fa-lg"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-github fa-lg"></i></a>
+                        <a href="https://www.linkedin.com/in/sahilkumardata/" class="text-light me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+                        <a href="https://github.com/pythoxb0/Cleansheet" class="text-light"><i class="fab fa-github fa-lg"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="mb-3">Product</h6>
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('main.index') }}" class="text-light">Home</a></li>
-                        <li><a href="{{ url_for('main.pricing') }}" class="text-light">Pricing</a></li>
-                        <li><a href="{{ url_for('main.upload') }}" class="text-light">Features</a></li>
+                        <li><a href="{{ url_for('main.help_center') }}" class="text-light">Features</a></li>
                         {% if current_user.is_authenticated %}
                             <li><a href="{{ url_for('main.dashboard') }}" class="text-light">Dashboard</a></li>
                         {% endif %}
@@ -115,10 +112,9 @@
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('main.help_center') }}" class="text-light">Help Center</a></li>
                         <li><a href="{{ url_for('main.contact') }}" class="text-light">Contact Us</a></li>
-                   
                     </ul>
                 </div>
-         
+               
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="mb-3">Account</h6>
                     <ul class="list-unstyled">

@@ -12,18 +12,8 @@ from datetime import datetime
 main = Blueprint('main', __name__)
 
 
-@main.route('/pricing')
-def pricing():
-    return render_template('pricing.html')
 
-@main.route('/upgrade')
-@login_required
-def upgrade():
-    """Show the upgrade form"""
-    if current_user.plan == 'pro':
-        flash('You already have a Pro account!', 'info')
-        return redirect(url_for('main.dashboard'))
-    return render_template('upgrade.html')
+
 
 @main.route('/')
 def index():
@@ -54,7 +44,7 @@ def help_center():
 @main.route('/contact')
 def contact(   ):
     return render_template('contact.html')                        
-                                    #: CONTACT ROUTE (FIXED)
+
 
 @main.route('/upload', methods=['GET', 'POST'])
 @login_required
@@ -97,9 +87,9 @@ def upload():
             )
             
             # Check if user can process this file
-            if not current_user.can_process_file(original_rows):
-                flash('Free tier limited to 500 rows. Upgrade to Pro for unlimited processing.', 'warning')
-                return redirect(url_for('main.dashboard'))
+            # if not current_user.can_process_file(original_rows):
+            #     flash('Free tier limited to 500 rows. Upgrade to Pro for unlimited processing.', 'warning')
+            #     return redirect(url_for('main.dashboard'))
             
             # Save file info to database
             new_file = File(

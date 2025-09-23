@@ -1,27 +1,22 @@
 {% extends "base.html" %}
-{% if current_user.plan == 'free' %}
-<div class="alert alert-info">
-    <h6>✨ Upgrade to Pro!</h6>
-    <p>Unlock unlimited rows, unlimited files, and priority features</p>
-    <a href="{{ url_for('payment.upgrade') }}" class="btn btn-sm btn-primary">Upgrade Now - $5/month</a>
-</div>
-{% else %}
-<div class="alert alert-success">
-    <h6>✅ Pro Account Active</h6>
-    <p>You have access to all premium features</p>
-    <a href="{{ url_for('payment.downgrade') }}" class="btn btn-sm btn-outline-secondary">Downgrade to Free</a>
-</div>
-{% endif %}
+
 {% block content %}
 <div class="row">
     <div class="col-md-8">
         <h2>Welcome, {{ current_user.email }}!</h2>
         <p class="lead">Your data cleaning dashboard</p>
         
+        <!-- WELCOME MESSAGE INSTEAD OF PLAN ALERTS -->
+        <div class="alert alert-success">
+            <h6>🎉 Welcome to CleanSheet!</h6>
+            <p>You have full access to all data cleaning features. Start by uploading your first file!</p>
+        </div>
+        
         <div class="row mt-4">
             <div class="col-md-6">
                 <div class="card text-center">
                     <div class="card-body">
+                        <i class="fas fa-upload fa-3x text-primary mb-3"></i>
                         <h5 class="card-title">Clean New File</h5>
                         <p class="card-text">Upload and process a new CSV or Excel file</p>
                         <a href="{{ url_for('main.upload') }}" class="btn btn-primary">Upload File</a>
@@ -31,13 +26,12 @@
             <div class="col-md-6">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">Your Plan</h5>
+                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Unlimited Access</h5>
                         <p class="card-text">
-                            <span class="badge bg-{{ 'success' if current_user.plan == 'pro' else 'secondary' }}">
-                                {{ current_user.plan|upper }}
-                            </span>
+                            <span class="badge bg-success">ALL FEATURES</span>
                         </p>
-                        <p class="small">Free tier: 500 rows per file</p>
+                        <p class="small">Process unlimited files and rows</p>
                     </div>
                 </div>
             </div>
@@ -47,7 +41,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                <h5>Recent Files</h5>
+                <h5><i class="fas fa-history me-2"></i>Recent Files</h5>
             </div>
             <div class="card-body">
                 {% if files %}
@@ -56,17 +50,41 @@
                             <div class="list-group-item">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">{{ file.original_filename }}</h6>
-                                    <small>{{ file.created_at.strftime('%Y-%m-%d') }}</small>
+                                    <small>{{ file.created_at.strftime('%m/%d/%Y') }}</small>
                                 </div>
                                 <p class="mb-1 small">
-                                    {{ file.rows_original }} → {{ file.rows_cleaned }} rows
+                                    <i class="fas fa-table me-1"></i>{{ file.rows_original }} → {{ file.rows_cleaned }} rows
                                 </p>
+                                <small class="text-muted">Processed with {{ file.operations|length }} operations</small>
                             </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <p class="text-muted">No files processed yet</p>
+                    <div class="text-center py-4">
+                        <i class="fas fa-folder-open fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No files processed yet</p>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-sm btn-outline-primary">Upload Your First File</a>
+                    </div>
                 {% endif %}
+            </div>
+        </div>
+        
+        <!-- QUICK STATS CARD -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-bar me-2"></i>Quick Stats</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4>{{ files|length }}</h4>
+                        <small class="text-muted">Total Files</small>
+                    </div>
+                    <div class="col-6">
+                        <h4>{{ files|sum(attribute='rows_original') if files else 0 }}</h4>
+                        <small class="text-muted">Rows Processed</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

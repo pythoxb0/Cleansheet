@@ -44,10 +44,8 @@ def create_app():
     with app.app_context():
         from app.routes import main as main_blueprint
         from app.auth import auth as auth_blueprint
-        from app.payment import payment as payment_blueprint
         
         app.register_blueprint(main_blueprint)
         app.register_blueprint(auth_blueprint)
-        app.register_blueprint(payment_blueprint)
     
     return app
