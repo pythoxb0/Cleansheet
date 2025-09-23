@@ -1,88 +1,137 @@
 {% extends "base.html" %}
 
+{% block title %}Dashboard - CleanSheet{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <h2>Welcome, {{ current_user.email }}!</h2>
-        <p class="lead">Your data cleaning dashboard</p>
-        
-        <!-- WELCOME MESSAGE INSTEAD OF PLAN ALERTS -->
-        <div class="alert alert-success">
-            <h6>🎉 Welcome to CleanSheet!</h6>
-            <p>You have full access to all data cleaning features. Start by uploading your first file!</p>
-        </div>
-        
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-upload fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Clean New File</h5>
-                        <p class="card-text">Upload and process a new CSV or Excel file</p>
-                        <a href="{{ url_for('main.upload') }}" class="btn btn-primary">Upload File</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Unlimited Access</h5>
-                        <p class="card-text">
-                            <span class="badge bg-success">ALL FEATURES</span>
-                        </p>
-                        <p class="small">Process unlimited files and rows</p>
+<div class="container mt-4">
+    <!-- Welcome Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2>Welcome back, {{ current_user.username }}! 👋</h2>
+                            <p class="mb-0">Ready to clean your next dataset? Your files are processed securely and never stored.</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{{ url_for('main.upload') }}" class="btn btn-light btn-lg">
+                                <i class="bi bi-cloud-upload"></i> Upload New File
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-history me-2"></i>Recent Files</h5>
-            </div>
-            <div class="card-body">
-                {% if files %}
-                    <div class="list-group">
-                        {% for file in files %}
-                            <div class="list-group-item">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">{{ file.original_filename }}</h6>
-                                    <small>{{ file.created_at.strftime('%m/%d/%Y') }}</small>
-                                </div>
-                                <p class="mb-1 small">
-                                    <i class="fas fa-table me-1"></i>{{ file.rows_original }} → {{ file.rows_cleaned }} rows
-                                </p>
-                                <small class="text-muted">Processed with {{ file.operations|length }} operations</small>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-folder-open fa-2x text-muted mb-3"></i>
-                        <p class="text-muted">No files processed yet</p>
-                        <a href="{{ url_for('main.upload') }}" class="btn btn-sm btn-outline-primary">Upload Your First File</a>
-                    </div>
-                {% endif %}
+
+    <!-- Quick Stats -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center card-hover">
+                <div class="card-body">
+                    <i class="bi bi-shield-check feature-icon"></i>
+                    <h5>Privacy First</h5>
+                    <p class="text-muted">Files processed in memory and deleted immediately after download.</p>
+                </div>
             </div>
         </div>
-        
-        <!-- QUICK STATS CARD -->
-        <div class="card mt-3">
-            <div class="card-header">
-                <h6><i class="fas fa-chart-bar me-2"></i>Quick Stats</h6>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center card-hover">
+                <div class="card-body">
+                    <i class="bi bi-lightning-charge feature-icon"></i>
+                    <h5>Fast Processing</h5>
+                    <p class="text-muted">Clean your data in seconds with our optimized algorithms.</p>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-6">
-                        <h4>{{ files|length }}</h4>
-                        <small class="text-muted">Total Files</small>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center card-hover">
+                <div class="card-body">
+                    <i class="bi bi-table feature-icon"></i>
+                    <h5>Multiple Formats</h5>
+                    <p class="text-muted">Support for CSV, Excel files with more formats coming soon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bi bi-cloud-upload"></i> Quick Upload</h5>
+                </div>
+                <div class="card-body">
+                    <p>Start cleaning your data right away:</p>
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-primary w-100 mb-3">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Clean CSV File
+                    </a>
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-success w-100">
+                        <i class="bi bi-file-earmark-excel"></i> Clean Excel File
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bi bi-question-circle"></i> Need Help?</h5>
+                </div>
+                <div class="card-body">
+                    <p>Check out our help resources:</p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.help_center') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-book"></i> Help Center
+                        </a>
+                        <a href="mailto:support@cleansheet.com" class="btn btn-outline-success">
+                            <i class="bi bi-envelope"></i> Contact Support
+                        </a>
                     </div>
-                    <div class="col-6">
-                        <h4>{{ files|sum(attribute='rows_original') if files else 0 }}</h4>
-                        <small class="text-muted">Rows Processed</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity (Removed History) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bi bi-info-circle"></i> How It Works</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="bi bi-upload text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>1. Upload</h6>
+                            <p class="text-muted small">Select your CSV or Excel file</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="bi bi-gear text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>2. Process</h6>
+                            <p class="text-muted small">Choose cleaning options</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="bi bi-download text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>3. Download</h6>
+                            <p class="text-muted small">Get your cleaned file instantly</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="bi bi-trash text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>4. Secure</h6>
+                            <p class="text-muted small">File deleted from our servers</p>
+                        </div>
                     </div>
                 </div>
             </div>

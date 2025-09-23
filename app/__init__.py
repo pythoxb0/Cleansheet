@@ -4,16 +4,19 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
+from flask_bcrypt import Bcrypt
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 mail = Mail()
 csrf = CSRFProtect()
+bcrypt = Bcrypt()  # Only initialize once
 
 def create_app():
     app = Flask(__name__)
@@ -32,12 +35,14 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@cleansheet.com')
     
-    # Initialize extensions
+    # Initialize extensions with app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
+    bcrypt.init_app(app)
+    
     login_manager.login_view = 'auth.login'
     
     # Register blueprints (import here to avoid circular imports)
@@ -47,5 +52,5 @@ def create_app():
         
         app.register_blueprint(main_blueprint)
         app.register_blueprint(auth_blueprint)
-    
-    return app
+     
+    return app  # ✅ Fixed this line - removed "init"

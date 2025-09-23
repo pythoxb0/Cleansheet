@@ -8,7 +8,27 @@
                 <h4>Upload and Clean Your File</h4>
             </div>
             <div class="card-body">
+                
+                <!-- Download Section (Show only when file is processed) -->
+                {% if download_file %}
+                <div class="alert alert-success mb-4">
+                    <h5>✅ File Processed Successfully!</h5>
+                    <p>Your file has been cleaned and is ready for download.</p>
+                    <div class="mt-3">
+                        <a href="{{ url_for('main.download_file', filename=download_file) }}" 
+                           class="btn btn-success btn-lg">
+                            <i class="bi bi-download"></i> Download Cleaned File
+                        </a>
+                        <a href="{{ url_for('main.upload') }}" class="btn btn-outline-secondary">
+                            Process Another File
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
                 <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    
                     <div class="mb-4">
                         <label for="file" class="form-label">Select file (CSV or Excel)</label>
                         <input type="file" class="form-control" id="file" name="file" accept=".csv,.xlsx,.xls" required>
@@ -20,6 +40,7 @@
                             <h5 class="mb-0">Cleaning Options</h5>
                         </div>
                         <div class="card-body">
+                            <!-- Your existing form options here -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-check mb-3">
@@ -27,40 +48,32 @@
                                         <label class="form-check-label" for="remove_duplicates">
                                             <strong>Remove duplicates</strong>
                                         </label>
-                                        <div class="form-text">Remove duplicate rows</div>
                                     </div>
-                                    
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" type="checkbox" name="trim_whitespace" id="trim_whitespace" checked>
                                         <label class="form-check-label" for="trim_whitespace">
                                             <strong>Trim whitespace</strong>
                                         </label>
-                                        <div class="form-text">Remove extra spaces from text</div>
                                     </div>
                                 </div>
-                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label"><strong>Handle missing values:</strong></label>
                                         <select class="form-select" name="fill_missing">
                                             <option value="">Leave as is</option>
-                                            <option value="mean">Fill with mean (numeric columns)</option>
-                                            <option value="median">Fill with median (numeric columns)</option>
+                                            <option value="mean">Fill with mean</option>
+                                            <option value="median">Fill with median</option>
                                             <option value="custom">Fill with custom value</option>
                                         </select>
                                     </div>
-                                    
                                     <div class="mb-3" id="custom-value-container" style="display: none;">
-                                        <label class="form-label">Custom value:</label>
                                         <input type="text" class="form-control" name="custom_value" placeholder="Enter value">
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="mb-3">
                                 <label class="form-label"><strong>Rename columns</strong></label>
                                 <input type="text" class="form-control" name="rename_columns" placeholder="old1:new1, old2:new2">
-                                <div class="form-text">Format: old_name:new_name, old_name2:new_name2</div>
                             </div>
                         </div>
                     </div>
@@ -73,4 +86,12 @@
         </div>
     </div>
 </div>
+
+<script>
+// Show/hide custom value input
+document.querySelector('select[name="fill_missing"]').addEventListener('change', function() {
+    const customContainer = document.getElementById('custom-value-container');
+    customContainer.style.display = this.value === 'custom' ? 'block' : 'none';
+});
+</script>
 {% endblock %}

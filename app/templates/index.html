@@ -1,57 +1,347 @@
 {% extends "base.html" %}
 
+{% block title %}CleanSheet - Data Cleaning Made Easy{% endblock %}
+
 {% block content %}
-<div class="hero-section text-center py-5 bg-light">
+<!-- Hero Section -->
+<section class="hero-section">
     <div class="container">
-        <h1 class="display-4 fw-bold mb-4">Clean & Transform Your Data in Seconds</h1>
-        <p class="lead mb-4">Upload CSV or Excel files, apply powerful cleaning operations, and download pristine data.</p>
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Clean Your Data in Seconds ⚡</h1>
+                <p class="lead mb-4">Upload, clean, and download your CSV/Excel files securely. No storage, no history, just clean data.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    {% if current_user.is_authenticated %}
+                    <!-- Show this for logged-in users -->
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-light btn-lg">
+                        <i class="bi bi-cloud-upload me-2"></i> Clean a File
+                    </a>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-speedometer2 me-2"></i> Go to Dashboard
+                    </a>
+                    {% else %}
+                    <!-- Show this for non-logged-in users -->
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-light btn-lg">
+                        <i class="bi bi-cloud-upload me-2"></i> Start Cleaning
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-person-plus me-2"></i> Sign Up Free
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Trust Badges -->
+                <div class="mt-4 d-flex align-items-center gap-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shield-check text-white me-2"></i>
+                        <small class="text-white-50">100% Secure</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-lightning-charge text-white me-2"></i>
+                        <small class="text-white-50">Instant Processing</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-trash text-white me-2"></i>
+                        <small class="text-white-50">No Data Storage</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <i class="bi bi-table text-white" style="font-size: 12rem; opacity: 0.9;"></i>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold">Why Choose CleanSheet? 🌟</h2>
+                <p class="text-muted">Everything you need for perfect data cleaning</p>
+            </div>
+        </div>
         
-        <div class="row justify-content-center mb-5">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-md-4">
-                                <h3>↑ Upload</h3>
-                                <p>Drag & drop your files</p>
-                            </div>
-                            <div class="col-md-4">
-                                <h3>⚡ Clean</h3>
-                                <p>Apply cleaning operations</p>
-                            </div>
-                            <div class="col-md-4">
-                                <h3>↓ Download</h3>
-                                <p>Get clean data instantly</p>
-                            </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-shield-check" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Military-Grade Security</h5>
+                        <p class="text-muted">Your files are processed in memory and deleted immediately. Zero data retention policy.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-primary">SSL Encrypted</span>
+                            <span class="badge bg-success">No Storage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-success bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-lightning-charge" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Lightning Fast</h5>
+                        <p class="text-muted">Clean thousands of rows in seconds with our optimized processing algorithms.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-success">Fast Processing</span>
+                            <span class="badge bg-info">Bulk Operations</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-info bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-magic" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Smart Cleaning</h5>
+                        <p class="text-muted">Remove duplicates, trim whitespace, handle missing values, and more with one click.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-info">AI-Powered</span>
+                            <span class="badge bg-warning">Smart Detection</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-warning bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-table" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Multi-Format Support</h5>
+                        <p class="text-muted">Work with CSV, Excel files. Perfect for analysts, researchers, and business users.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-dark">CSV</span>
+                            <span class="badge bg-success">Excel</span>
+                            <span class="badge bg-info">XLS/XLSX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-danger bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-graph-up" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">Data Quality Boost</h5>
+                        <p class="text-muted">Improve your data quality for better analytics, reporting, and decision making.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-danger">Quality Check</span>
+                            <span class="badge bg-purple">Validation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 card-hover h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-purple bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-headset" style="font-size: 1.8rem;"></i>
+                        </div>
+                        <h5 class="fw-bold">24/7 Support</h5>
+                        <p class="text-muted">Get help when you need it with our comprehensive documentation and support team.</p>
+                        <div class="mt-3">
+                            <span class="badge bg-purple">Quick Support</span>
+                            <span class="badge bg-primary">Documentation</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.upload') }}" class="btn btn-primary btn-lg me-3">Start Cleaning</a>
-            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary btn-lg">Dashboard</a>
-        {% else %}
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-3">Get Started Free</a>
-        {% endif %}
     </div>
-</div>
+</section>
 
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-4 text-center">
-            <h4>Remove Duplicates</h4>
-            <p>Eliminate duplicate rows with one click</p>
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold">How It Works 🚀</h2>
+                <p class="text-muted">Get clean data in just 3 simple steps</p>
+            </div>
         </div>
-        <div class="col-md-4 text-center">
-            <h4>Trim Whitespace</h4>
-            <p>Clean up messy spacing in your data</p>
-        </div>
-        <div class="col-md-4 text-center">
-            <h4>Handle Missing Values</h4>
-            <p>Fill or remove empty cells intelligently</p>
+        
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="position-relative">
+                    <div class="bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                        <i class="bi bi-cloud-upload" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div class="position-absolute top-0 start-100 translate-middle">
+                        <span class="badge bg-success rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">1</span>
+                    </div>
+                </div>
+                <h5 class="fw-bold">Upload Your File</h5>
+                <p class="text-muted">Securely upload your CSV or Excel file. We support all major formats.</p>
+                <ul class="list-unstyled text-start">
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Drag & drop support</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Up to 10MB files</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>Instant upload</li>
+                </ul>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="position-relative">
+                    <div class="bg-success bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                        <i class="bi bi-gear" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div class="position-absolute top-0 start-100 translate-middle">
+                        <span class="badge bg-primary rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">2</span>
+                    </div>
+                </div>
+                <h5 class="fw-bold">Choose Cleaning Options</h5>
+                <p class="text-muted">Select from various cleaning operations to perfect your data.</p>
+                <ul class="list-unstyled text-start">
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Remove duplicates</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Trim whitespace</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>Handle missing values</li>
+                </ul>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="position-relative">
+                    <div class="bg-info bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                        <i class="bi bi-download" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div class="position-absolute top-0 start-100 translate-middle">
+                        <span class="badge bg-warning rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">3</span>
+                    </div>
+                </div>
+                <h5 class="fw-bold">Download Instantly</h5>
+                <p class="text-muted">Get your cleaned file immediately. Your original file is automatically deleted.</p>
+                <ul class="list-unstyled text-start">
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>One-click download</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Same format output</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>Auto file deletion</li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body py-5">
+                        <i class="bi bi-rocket-takeoff text-primary mb-3" style="font-size: 3rem;"></i>
+                        <h3 class="fw-bold mb-3">
+                            {% if current_user.is_authenticated %}
+                            Ready to Clean Another File? 🎯
+                            {% else %}
+                            Ready to Transform Your Data? 🚀
+                            {% endif %}
+                        </h3>
+                        <p class="text-muted mb-4 lead">
+                            {% if current_user.is_authenticated %}
+                            Continue your data cleaning journey with advanced features and secure processing.
+                            {% else %}
+                            Join thousands of professionals who trust CleanSheet for their data cleaning needs.
+                            {% endif %}
+                        </p>
+                        <div class="d-flex gap-3 justify-content-center flex-wrap">
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('main.upload') }}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-cloud-upload me-2"></i>Upload New File
+                            </a>
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-speedometer2 me-2"></i>View Dashboard
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus me-2"></i>Sign Up Free
+                            </a>
+                            <a href="{{ url_for('main.upload') }}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-play-circle me-2"></i>See Demo
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Security Section -->
+<section class="py-5 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-3"><i class="bi bi-shield-lock me-2"></i>Your Privacy is Our Priority</h3>
+                <p class="lead mb-4">We believe in complete data privacy. Here's how we protect you:</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-arrow-clockwise text-success me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="mb-1">In-Memory Processing</h6>
+                                <p class="mb-0 text-white-50 small">Files are processed in RAM, never written to disk</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-trash text-danger me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="mb-1">Automatic Deletion</h6>
+                                <p class="mb-0 text-white-50 small">All files deleted immediately after processing</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-lock text-warning me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="mb-1">SSL Encryption</h6>
+                                <p class="mb-0 text-white-50 small">All data transfers are encrypted end-to-end</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-eye-slash text-info me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="mb-1">No Data Storage</h6>
+                                <p class="mb-0 text-white-50 small">We never store or access your files</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="bi bi-shield-check" style="font-size: 8rem; opacity: 0.7;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.card-hover {
+    transition: all 0.3s ease;
+}
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+</style>
 {% endblock %}

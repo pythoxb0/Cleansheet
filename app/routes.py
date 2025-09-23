@@ -7,6 +7,14 @@ from io import BytesIO
 import uuid
 import os
 from datetime import datetime
+from app.forms import LoginForm, RegistrationForm, UploadForm
+
+from flask import render_template, request, flash, redirect, url_for
+from werkzeug.utils import secure_filename
+import pandas as pd
+import os
+
+
 
 # Create the blueprint first
 main = Blueprint('main', __name__)
@@ -39,81 +47,198 @@ def internal_error(e):
 
 @main.route('/help-center')
 def help_center():
+    search_query = request.args.get('q', '')
     return render_template('help_center.html')
 
 @main.route('/contact')
 def contact(   ):
-    return render_template('contact.html')                        
+    return render_template('contact.html')    
 
+                    
+@main.route('/404')
+def not_found():
+    return render_template('404.html'), 404
+
+from flask import send_file, after_this_request
+import os
+import tempfile
 
 @main.route('/upload', methods=['GET', 'POST'])
-@login_required
 def upload():
     if request.method == 'POST':
+        # Check if file is present
         if 'file' not in request.files:
-            flash('No file selected', 'danger')
+            flash('No file selected', 'error')
             return redirect(request.url)
         
         file = request.files['file']
+        
         if file.filename == '':
-            flash('No file selected', 'danger')
+            flash('No file selected', 'error')
             return redirect(request.url)
-        
-        if not (file.filename.lower().endswith(('.csv', '.xlsx', '.xls'))):
-            flash('Please upload a CSV or Excel file', 'danger')
-            return redirect(request.url)
-        
-        # Get cleaning options from form
-        options = {
-            'remove_duplicates': request.form.get('remove_duplicates') == 'on',
-            'trim_whitespace': request.form.get('trim_whitespace') == 'on',
-            'fill_missing': request.form.get('fill_missing', ''),
-            'custom_value': request.form.get('custom_value', ''),
-            'rename_map': {}
-        }
-        
-        # Process rename mappings if provided
-        rename_pairs = request.form.get('rename_columns', '')
-        if rename_pairs:
-            for pair in rename_pairs.split(','):
-                if ':' in pair:
-                    old_col, new_col = pair.split(':', 1)
-                    options['rename_map'][old_col.strip()] = new_col.strip()
         
         try:
+            # Create a temporary directory if it doesn't exist
+            temp_dir = os.path.join(os.getcwd(), 'temp_files')
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir)
+            
+            # Get form data
+            remove_duplicates = 'remove_duplicates' in request.form
+            trim_whitespace = 'trim_whitespace' in request.form
+            fill_missing = request.form.get('fill_missing', '')
+            custom_value = request.form.get('custom_value', '')
+            rename_columns = request.form.get('rename_columns', '')
+            
             # Process the file
-            cleaned_file, original_rows, cleaned_rows = process_file(
-                file, file.filename, options
-            )
+            filename = secure_filename(file.filename)
             
-            # Check if user can process this file
-            # if not current_user.can_process_file(original_rows):
-            #     flash('Free tier limited to 500 rows. Upgrade to Pro for unlimited processing.', 'warning')
-            #     return redirect(url_for('main.dashboard'))
+            if filename.endswith('.csv'):
+                df = pd.read_csv(file)
+            else:
+                df = pd.read_excel(file)
             
-            # Save file info to database
-            new_file = File(
-                user_id=current_user.id,
-                original_filename=file.filename,
-                cleaned_filename=f"cleaned_{file.filename}",
-                rows_original=original_rows,
-                rows_cleaned=cleaned_rows,
-                operations=options
-            )
-            db.session.add(new_file)
-            db.session.commit()
+            # Apply cleaning operations
+            if remove_duplicates:
+                df = df.drop_duplicates()
             
-            # Send the cleaned file for download
-            flash('File processed successfully!', 'success')
-            return send_file(
-                cleaned_file,
-                as_attachment=True,
-                download_name=f"cleaned_{file.filename}",
-                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+            if trim_whitespace:
+                df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
+            
+            # Handle missing values
+            if fill_missing == 'mean':
+                df = df.fillna(df.mean(numeric_only=True))
+            elif fill_missing == 'median':
+                df = df.fillna(df.median(numeric_only=True))
+            elif fill_missing == 'custom' and custom_value:
+                df = df.fillna(custom_value)
+            
+            # Handle column renaming
+            if rename_columns:
+                rename_dict = {}
+                for pair in rename_columns.split(','):
+                    if ':' in pair:
+                        old, new = pair.split(':', 1)
+                        rename_dict[old.strip()] = new.strip()
+                if rename_dict:
+                    df = df.rename(columns=rename_dict)
+            
+            # Save cleaned file to temporary directory
+            cleaned_filename = 'cleaned_' + filename
+            cleaned_filepath = os.path.join(temp_dir, cleaned_filename)
+            
+            if filename.endswith('.csv'):
+                df.to_csv(cleaned_filepath, index=False)
+                download_mimetype = 'text/csv'
+            else:
+                df.to_excel(cleaned_filepath, index=False)
+                download_mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            
+            flash('File processed successfully! Click "Download" to get your cleaned file.', 'success')
+            
+            # Return both the success message and download link
+            return render_template('upload.html', 
+                                 download_file=cleaned_filename,
+                                 original_filename=filename)
             
         except Exception as e:
-            flash(f'Error processing file: {str(e)}', 'danger')
+            flash(f'Error processing file: {str(e)}', 'error')
+    
+    return render_template('upload.html')
+
+@main.route('/download/<filename>')
+def download_file(filename):
+    """Download the cleaned file"""
+    temp_dir = os.path.join(os.getcwd(), 'temp_files')
+    file_path = os.path.join(temp_dir, filename)
+    
+    if os.path.exists(file_path):
+        # Clean up the file after sending
+        @after_this_request
+        def remove_file(response):
+            try:
+                os.remove(file_path)
+            except Exception as error:
+                print(f"Error removing file: {error}")
+            return response
+        
+        return send_file(file_path, as_attachment=True, download_name=filename)
+    else:
+        flash('File not found. Please process your file again.', 'error')
+        return redirect(url_for('main.upload'))
+def upload():
+    if request.method == 'POST':
+        # Check if file is present
+        if 'file' not in request.files:
+            flash('No file selected', 'error')
             return redirect(request.url)
+        
+        file = request.files['file']
+        
+        # Check if file is selected
+        if file.filename == '':
+            flash('No file selected', 'error')
+            return redirect(request.url)
+        
+        # Check file extension
+        allowed_extensions = {'csv', 'xlsx', 'xls'}
+        if not ('.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in allowed_extensions):
+            flash('Invalid file type. Please upload CSV or Excel files.', 'error')
+            return redirect(request.url)
+        
+        try:
+            # Get form data
+            remove_duplicates = 'remove_duplicates' in request.form
+            trim_whitespace = 'trim_whitespace' in request.form
+            fill_missing = request.form.get('fill_missing', '')
+            custom_value = request.form.get('custom_value', '')
+            rename_columns = request.form.get('rename_columns', '')
+            
+            # Process the file based on extension
+            filename = secure_filename(file.filename)
+            
+            if filename.endswith('.csv'):
+                df = pd.read_csv(file)
+            else:
+                df = pd.read_excel(file)
+            
+            # Apply cleaning operations
+            if remove_duplicates:
+                df = df.drop_duplicates()
+            
+            if trim_whitespace:
+                # Trim whitespace from string columns
+                df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
+            
+            # Handle missing values
+            if fill_missing == 'mean':
+                df = df.fillna(df.mean(numeric_only=True))
+            elif fill_missing == 'median':
+                df = df.fillna(df.median(numeric_only=True))
+            elif fill_missing == 'custom' and custom_value:
+                df = df.fillna(custom_value)
+            
+            # Handle column renaming
+            if rename_columns:
+                rename_dict = {}
+                for pair in rename_columns.split(','):
+                    if ':' in pair:
+                        old, new = pair.split(':', 1)
+                        rename_dict[old.strip()] = new.strip()
+                if rename_dict:
+                    df = df.rename(columns=rename_dict)
+            
+            # Save cleaned file
+            cleaned_filename = 'cleaned_' + filename
+            if filename.endswith('.csv'):
+                df.to_csv(cleaned_filename, index=False)
+            else:
+                df.to_excel(cleaned_filename, index=False)
+            
+            flash('File processed successfully!', 'success')
+            # You can add a download link here
+            
+        except Exception as e:
+            flash(f'Error processing file: {str(e)}', 'error')
     
     return render_template('upload.html')
