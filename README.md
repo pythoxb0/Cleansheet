@@ -1,30 +1,30 @@
-# CleanSheet – Excel Data Cleaner (Flask Web App)
+# CleanSheet
 
-**CleanSheet** is a Flask-based web application that helps users clean Excel datasets efficiently. Designed with a SaaS-style structure, it features login/logout functionality and Free & Pro plan options (dummy setup for demo purposes).
+A modern, secure web application for managing and organizing data with an intuitive interface. Built with Flask and featuring user authentication, password recovery, and a clean, responsive design.
 
----
+## 🚀 Features
 
-## Features
+- **User Authentication**: Secure login and registration system
+- **Password Recovery**: Email-based password reset functionality
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Database Integration**: SQLAlchemy with Flask-Migrate for database management
+- **Email Support**: Flask-Mail integration for notifications
+- **CSRF Protection**: Built-in security against cross-site request forgery
+- **User Sessions**: Flask-Login for session management
 
-- **User Authentication:** Secure login and logout system with session handling.  
-- **Free & Pro Plans:** Dummy plans to demonstrate tiered access.  
-- **Excel Data Cleaning:** Remove duplicates, handle missing values, trim spaces, and export cleaned files.  
-- **User-Friendly Interface:** Simple and intuitive design using **HTML, CSS, Bootstrap**.  
-- **Scalable Structure:** Built with Flask and SQLite for easy expansion into a full SaaS product.  
+## 🛠️ Technology Stack
 
----
+- **Backend**: Python, Flask
+- **Database**: SQLite (development), PostgreSQL (production-ready)
+- **Frontend**: HTML5, CSS3, JavaScript, Jinja2 templates
+- **Authentication**: Flask-Login, Flask-Bcrypt
+- **Security**: Flask-WTF CSRF protection
+- **Email**: Flask-Mail
+- **Database Migrations**: Flask-Migrate
 
-## Tech Stack
+## 📦 Installation
 
-- **Backend:** Python, Flask  
-- **Data Handling:** Pandas  
-- **Frontend:** HTML, CSS, Bootstrap  
-- **Database:** SQLite  
+### Prerequisites
+- Python 3.8+
+- pip (Python package manager)
 
----
-
-## Installation
-
-1. Clone the repository:  
-```bash
-git clone https://github.com/pythoxb/cleansheet.git
