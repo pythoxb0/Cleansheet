@@ -12,9 +12,13 @@ app = create_app()
 app.config['SECRET_KEY'] = 'dev-secret-key-change-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
+# Auto-create tables on first deploy
+with app.app_context():
+    db.create_all()
+
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'User': User, 'File': File}
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  # For local testing; Render uses gunicorn
