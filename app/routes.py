@@ -1,18 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, after_this_request
 from flask_login import login_required, current_user
-from app import db
-from app.models import User, File
-from app.cleaning import process_file
-from io import BytesIO
-import uuid
-import os
-from datetime import datetime
-from app.forms import LoginForm, RegistrationForm, UploadForm
-
-from flask import render_template, request, flash, redirect, url_for
 from werkzeug.utils import secure_filename
-import pandas as pd
 import os
+import pandas as pd
+from app.models import User, File
+from app import db
 
 
 
@@ -59,9 +51,7 @@ def contact(   ):
 def not_found():
     return render_template('404.html'), 404
 
-from flask import send_file, after_this_request
-import os
-import tempfile
+
 
 @main.route('/upload', methods=['GET', 'POST'])
 def upload():

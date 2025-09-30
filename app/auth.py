@@ -1,42 +1,50 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from app import db, login_manager
-from app.models import User
-from app.forms import LoginForm, RegistrationForm, ForgotPasswordForm, ResetPasswordForm
-from app.forms import LoginForm, RegistrationForm, ForgotPasswordForm, ResetPasswordForm
-from app.email_utils import send_password_reset_email
-from flask_mail import Message
-from app import mail
-from flask import Blueprint, render_template, url_for, flash, redirect, request
-from flask_login import login_user, current_user, logout_user, login_required
-from app import db, bcrypt
+from app import db, login_manager, bcrypt, mail
 from app.models import User
 from app.forms import LoginForm, RegistrationForm, ForgotPasswordForm, ResetPasswordForm
 from app.email_utils import send_password_reset_email
+
 # Create the blueprint first
 auth = Blueprint('auth', __name__)
-
-
-def send_password_reset_email(user):
-    token = user.get_reset_token()
-    msg = Message('Password Reset Request',
-                  sender='noreply@cleansheet.com',
-                  recipients=[user.email])  # Make sure this is user.email
-    
-    msg.body = f'''To reset your password, visit the following link:
-{url_for('auth.reset_password', token=token, _external=True)}
-
-If you did not make this request, please ignore this email.
-'''
-    mail.send(msg)
-
-
-
-
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+from flask import session
+
+
+
+
+def send_password_reset_email(user):
+    try:
+        token = user.get_reset_token()
+        reset_url = url_for('auth.reset_password', token=token, _external=True)
+        
+        msg = Message(
+            subject="Password Reset Request - CleanSheet",
+            recipients=[user.email],
+            html=f"""
+            <h3>Password Reset Request</h3>
+            <p>You requested a password reset for your CleanSheet account.</p>
+            <p>Click the link below to reset your password (valid for 30 minutes):</p>
+            <a href="{reset_url}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+            <p><strong>Reset Link:</strong> {reset_url}</p>
+            <p>If you didn't request this, please ignore this email.</p>
+            <hr>
+            <p><small>CleanSheet - Your data cleaning companion</small></p>
+            """
+        )
+        mail.send(msg)
+        return True  # Success
+        
+    except Exception as e:
+        print(f"Email sending failed: {e}")
+        return False  # Failure
+
+
+
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
@@ -44,34 +52,67 @@ def register():
         return redirect(url_for('main.dashboard'))
     
     form = RegistrationForm()
+    print(f"DEBUG: Form created. Request method: {request.method}")  # DEBUG
     
     if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered', 'danger')
-            return render_template('register.html', form=form)
-        
-        user = User(email=email)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        
-        flash('Registration successful! Please login.', 'success')
-        return redirect(url_for('auth.login'))
+        print("DEBUG: Form validated successfully!")  # DEBUG
+        try:
+            username = form.username.data
+            email = form.email.data.lower()
+            password = form.password.data
+            
+            print(f"DEBUG: Form data - username: {username}, email: {email}")  # DEBUG
+            
+            # Check if username or email already exists
+            if User.query.filter_by(username=username).first():
+                print("DEBUG: Username already exists")  # DEBUG
+                flash('Username already taken', 'danger')
+                return render_template('auth/register.html', form=form)
+                
+            if User.query.filter_by(email=email).first():
+                print("DEBUG: Email already exists")  # DEBUG
+                flash('Email already registered', 'danger')
+                return render_template('auth/register.html', form=form)
+            
+            # Create user with username
+            user = User(username=username, email=email)
+            user.set_password(password)
+            
+            db.session.add(user)
+            db.session.commit()
+            print("DEBUG: User created and committed to database")  # DEBUG
+            
+            session['registration_success'] = True
+            print("DEBUG: Redirecting to login")  # DEBUG
+            return redirect(url_for('auth.login'))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"DEBUG: Registration error: {e}")  # DEBUG
+            flash(f'Registration failed: {str(e)}', 'danger')
+    else:
+        print(f"DEBUG: Form validation failed. Errors: {form.errors}")  # DEBUG
     
-    return render_template('register.html', form=form)
+    return render_template('auth/register.html', form=form)
+
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    # Check for registration success message
+    print(f"DEBUG: Session registration_success: {session.get('registration_success')}")  # DEBUG
+    if session.get('registration_success'):
+        flash('Registration successful! Please login.', 'success')
+        session.pop('registration_success', None)
+        print("DEBUG: Registration success message flashed")  # DEBUG
+    
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
     
     form = LoginForm()
     
     if form.validate_on_submit():
-        email = form.email.data
+        email = form.email.data.lower()
         password = form.password.data
         user = User.query.filter_by(email=email).first()
         
@@ -82,7 +123,7 @@ def login():
         else:
             flash('Invalid email or password', 'danger')
     
-    return render_template('login.html', form=form)
+    return render_template('auth/login.html', form=form)
 
 @auth.route('/logout')
 @login_required
@@ -92,10 +133,6 @@ def logout():
 
 
 
-
-
-
-# ... your existing routes ...
 @auth.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if current_user.is_authenticated:
@@ -103,24 +140,21 @@ def forgot_password():
     
     form = ForgotPasswordForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data.lower()).first()  # Added .lower() for case-insensitive
+        user = User.query.filter_by(email=form.email.data.lower()).first()
         
         if user:
-            try:
-                # Send password reset email
-                send_password_reset_email(user)
+            if send_password_reset_email(user):  # Now checks return value
                 flash('A password reset link has been sent to your email.', 'info')
-                return redirect(url_for('auth.login'))
-            except Exception as e:
+            else:
                 flash('Error sending email. Please try again later.', 'danger')
-                # Log the error for debugging
-                print(f"Email error: {e}")
         else:
-            # For security, don't reveal if email exists or not
+            # For security, don't reveal if email exists
             flash('If an account with that email exists, a password reset link has been sent.', 'info')
-            return redirect(url_for('auth.login'))  # Redirect even if user not found
+        
+        return redirect(url_for('auth.login'))
     
-    return render_template('auth/forgot_password.html', title='Forgot Password', form=form)
+    return render_template('auth/forgot_password.html', form=form)
+
 
 @auth.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):

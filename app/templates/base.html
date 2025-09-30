@@ -35,7 +35,7 @@
                         <!-- USER DROPDOWN MENU -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i>{{ current_user.email }}
+                                <i class="fas fa-user-circle me-1"></i>{{ current_user.username }}
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ url_for('main.dashboard') }}">
